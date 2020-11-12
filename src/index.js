@@ -1,9 +1,15 @@
+const { default: VueRouter } = require('vue-router');
+
+require('jquery');
+require('popper.js');
+require('bootstrap');
 require('./sass/index.sass');
 
 define([],function(){
     'use strict';
 
     Vue.use(VueResource);
+    Vue.use(VueRouter);
 
     Vue.http.options.emulateJSON = true;
     Vue.http.options.emulateHTTP = true;
@@ -14,18 +20,18 @@ define([],function(){
     ]
 
     const mixins = [
-    
+        require('./mixins/service-get')
+    ]
+
+    const router = [
+        require('./settings')
     ]
 
     new Vue({
         el: '#app',
         mixins : mixins,
         components : components,
-        data : function(){
-            return{
-                str : "Hello World!"
-            }
-        }
+        router : router
     })
 
 });
