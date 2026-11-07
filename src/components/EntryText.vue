@@ -1,0 +1,25 @@
+<script setup>
+import { computed } from 'vue'
+import { usePokedexStore } from '../stores/pokedex'
+
+const store = usePokedexStore()
+const name = computed(() => store.entry?.pokemon?.name?.toUpperCase() ?? '...')
+const text = computed(() => {
+  if (!store.entry) return '...'
+  return store.entry.text ? store.entry.text.toUpperCase() : 'NO DATA'
+})
+</script>
+
+<template>
+  <div class="entry">
+    <span class="entry-label">ENTRY</span>
+    <h1 class="entry-name">{{ name }}</h1>
+    <div class="terminal">
+      <template v-if="store.status === 'error'">
+        <p>ERROR: COULD NOT LOAD DATA.</p>
+        <button type="button" class="retry" @click="store.retry()">tentar de novo</button>
+      </template>
+      <p v-else>{{ text }}</p>
+    </div>
+  </div>
+</template>
