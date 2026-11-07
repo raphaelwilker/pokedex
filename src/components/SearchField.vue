@@ -7,6 +7,7 @@ const query = ref('')
 
 function onInput() {
   store.searchError = false
+  store.listError = false
 }
 
 function submit() {
@@ -21,11 +22,13 @@ function submit() {
       class="search-input"
       type="text"
       placeholder="Search name or #id..."
+      aria-label="Search name or #id"
       autocomplete="off"
       @input="onInput"
       @keydown.enter="submit"
     />
-    <span v-if="store.searchError" class="search-error">NOT FOUND</span>
+    <span v-if="store.listError" class="search-error">NETWORK ERROR</span>
+    <span v-else-if="store.searchError" class="search-error">NOT FOUND</span>
     <span v-else class="search-led" aria-hidden="true"></span>
   </div>
 </template>

@@ -114,3 +114,21 @@ test('EntryText shows an error and retries on click', async () => {
   await flushPromises()
   expect(store.status).toBe('idle')
 })
+
+test('EntryText shows the species name from the list instead of the form name', () => {
+  store.list = [{ id: 487, name: 'giratina' }]
+  store.currentId = 487
+  store.entry = { pokemon: { ...BULBASAUR, id: 487, name: 'giratina-altered' }, text: 'x' }
+  const text = mountWith(EntryText).text()
+  expect(text).toContain('GIRATINA')
+  expect(text).not.toContain('ALTERED')
+})
+
+test('SearchField shows a network error when the list could not be loaded', async () => {
+  store.listError = true
+  expect(mountWith(SearchField).text()).toContain('NETWORK ERROR')
+})
+
+test('SearchField has an accessible name', () => {
+  expect(mountWith(SearchField).find('input').attributes('aria-label')).toBe('Search name or #id')
+})

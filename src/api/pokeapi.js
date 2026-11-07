@@ -15,7 +15,7 @@ export function cleanFlavorText(raw) {
 }
 
 export async function fetchPokemonList() {
-  const data = await getJson(`/pokemon?limit=${MAX_ID}`)
+  const data = await getJson(`/pokemon-species?limit=${MAX_ID}`)
   return data.results.map(({ name, url }) => ({
     id: Number(url.split('/').filter(Boolean).pop()),
     name
