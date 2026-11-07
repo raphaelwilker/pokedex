@@ -148,3 +148,58 @@ test('failed fetch sets error status and retry recovers', async () => {
   expect(store.status).toBe('idle')
   expect(store.entry.pokemon.id).toBe(25)
 })
+
+test('search normalizes punctuation and spaces in names', async () => {
+  const store = usePokedexStore()
+  store.list = [
+    { id: 122, name: 'mr-mime' },
+    { id: 83, name: 'farfetchd' },
+    { id: 772, name: 'type-null' }
+  ]
+  expect(await store.search('Mr. Mime')).toBe(true)
+  expect(store.currentId).toBe(122)
+  expect(await store.search("Farfetch'd")).toBe(true)
+  expect(store.currentId).toBe(83)
+  expect(await store.search('type: null')).toBe(true)
+  expect(store.currentId).toBe(772)
+})
+
+test('a failed load clears the previous entry instead of showing stale data', async () => {
+  const store = makeStore()
+  await store.select(25)
+  fetchPokemon.mockRejectedValueOnce(new Error('boom'))
+  await store.select(26)
+  expect(store.status).toBe('error')
+  expect(store.entry).toBe(null)
+})
+
+test('a load in progress does not show the previous entry', async () => {
+  const store = makeStore()
+  await store.select(25)
+  let release
+  fetchPokemon.mockImplementationOnce(() => new Promise((r) => { release = r }))
+  const pending = store.select(26)
+  expect(store.entry).toBe(null)
+  release({ id: 26, name: 'p26', sprite: null, types: [], heightM: 1, weightKg: 1 })
+  await pending
+  expect(store.entry.pokemon.id).toBe(26)
+})
+
+test('a failed list fetch is a network error, not NOT FOUND, and does not touch the entry status', async () => {
+  const store = usePokedexStore()
+  fetchPokemonList.mockRejectedValueOnce(new Error('offline'))
+  await store.select(25)
+  expect(await store.search('pikachu')).toBe(false)
+  expect(store.listError).toBe(true)
+  expect(store.searchError).toBe(false)
+  expect(store.status).toBe('idle')
+})
+
+test('searching again after the list failure retries the list', async () => {
+  const store = usePokedexStore()
+  fetchPokemonList.mockRejectedValueOnce(new Error('offline'))
+  await store.search('pikachu')
+  expect(await store.search('pikachu')).toBe(true)
+  expect(store.listError).toBe(false)
+  expect(store.currentId).toBe(25)
+})

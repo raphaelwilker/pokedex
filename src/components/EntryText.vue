@@ -3,7 +3,12 @@ import { computed } from 'vue'
 import { usePokedexStore } from '../stores/pokedex'
 
 const store = usePokedexStore()
-const name = computed(() => store.entry?.pokemon?.name?.toUpperCase() ?? '...')
+const name = computed(() => {
+  const pokemon = store.entry?.pokemon
+  if (!pokemon) return '...'
+  const species = store.list.find((p) => p.id === pokemon.id)
+  return (species?.name ?? pokemon.name).toUpperCase()
+})
 const text = computed(() => {
   if (!store.entry) return '...'
   return store.entry.text ? store.entry.text.toUpperCase() : 'NO DATA'

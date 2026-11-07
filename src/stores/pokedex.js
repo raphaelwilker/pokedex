@@ -16,6 +16,7 @@ export const usePokedexStore = defineStore('pokedex', {
     entry: null,
     status: 'idle',
     searchError: false,
+    listError: false,
     cache: {}
   }),
 
@@ -33,10 +34,11 @@ export const usePokedexStore = defineStore('pokedex', {
   actions: {
     async init() {
       if (this.list.length) return
+      this.listError = false
       try {
         this.list = await fetchPokemonList()
       } catch {
-        this.status = 'error'
+        this.listError = true
       }
     },
 
@@ -45,6 +47,7 @@ export const usePokedexStore = defineStore('pokedex', {
       const token = ++requestToken
       this.currentId = target
       this.status = 'loading'
+      this.entry = this.cache[target] ?? null
       try {
         let entry = this.cache[target]
         if (!entry) {
@@ -78,13 +81,22 @@ export const usePokedexStore = defineStore('pokedex', {
     },
 
     async search(query) {
-      const text = String(query ?? '').trim().toLowerCase().replace(/^#/, '')
+      const text = String(query ?? '')
+        .trim()
+        .toLowerCase()
+        .replace(/^#/, '')
+        .replace(/[.':]/g, '')
+        .replace(/\s+/g, '-')
       let id = null
       if (/^\d+$/.test(text)) {
         const n = Number(text)
         if (isValidId(n)) id = n
       } else if (text) {
         await this.init()
+        if (!this.list.length) {
+          this.searchError = false
+          return false
+        }
         id = this.list.find((p) => p.name === text)?.id ?? null
       }
       if (id === null) {
