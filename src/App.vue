@@ -1,3 +1,10 @@
+<script setup>
+import PokedexShell from './components/PokedexShell.vue'
+import './styles/pokedex.css'
+</script>
+
 <template>
-  <h1>ENTRY</h1>
+  <main class="page">
+    <PokedexShell />
+  </main>
 </template>
