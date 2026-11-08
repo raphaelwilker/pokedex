@@ -105,3 +105,33 @@ test('data survives a restart of the app (module reloaded, same IndexedDB)', asy
   expect(await second.getEntry(25)).toEqual(entry(25))
   expect(await second.getList()).toEqual([{ id: 25, name: 'pikachu' }])
 })
+
+// Some WebKit versions never answer indexedDB.open on first launch: reading must give up.
+test('a hanging IndexedDB cannot block reading: it gives up after a short wait', async () => {
+  vi.stubGlobal('indexedDB', { open: () => ({}) })
+  const storage = await load()
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+  try {
+    const entryRead = storage.getEntry(1)
+    const listRead = storage.getList()
+    await vi.advanceTimersByTimeAsync(3000)
+    await expect(entryRead).resolves.toBeUndefined()
+    await expect(listRead).resolves.toBeUndefined()
+  } finally {
+    vi.useRealTimers()
+  }
+})
+
+test('a hanging IndexedDB cannot block saving either, and the data stays in memory', async () => {
+  vi.stubGlobal('indexedDB', { open: () => ({}) })
+  const storage = await load()
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+  try {
+    const saving = storage.setEntry(5, entry(5))
+    await vi.advanceTimersByTimeAsync(3000)
+    await expect(saving).resolves.toBeUndefined()
+    expect(await storage.getEntry(5)).toEqual(entry(5))
+  } finally {
+    vi.useRealTimers()
+  }
+})

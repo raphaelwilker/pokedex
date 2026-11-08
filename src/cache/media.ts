@@ -1,5 +1,6 @@
 import { createStore, del, entries, get, set } from 'idb-keyval'
 import type { UseStore } from 'idb-keyval'
+import { withTimeout } from './timeout'
 
 /*
  * Permanent cache for sprites and cries (IndexedDB). Files are stored as raw bytes
@@ -107,7 +108,7 @@ export async function resolveMedia(url: string): Promise<string> {
   try {
     const db = open()
     if (!db) return url
-    const file = await get<MediaData>(url, db.data)
+    const file = await withTimeout(get<MediaData>(url, db.data), undefined)
     if (file) {
       const touch: MediaMeta = { size: file.data.byteLength, lastUsed: Date.now() }
       void set(url, touch, db.meta).catch(() => {})

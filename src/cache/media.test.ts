@@ -158,3 +158,17 @@ test('revokeMedia only releases blob addresses', async () => {
   media.revokeMedia('blob:mock-1')
   expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock-1')
 })
+
+test('a hanging IndexedDB cannot block showing media: it gives up and returns the original address', async () => {
+  vi.stubGlobal('indexedDB', { open: () => ({}) })
+  mockFetch()
+  const media = await load()
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+  try {
+    const answer = media.resolveMedia('https://img/a.png')
+    await vi.advanceTimersByTimeAsync(3000)
+    await expect(answer).resolves.toBe('https://img/a.png')
+  } finally {
+    vi.useRealTimers()
+  }
+})
