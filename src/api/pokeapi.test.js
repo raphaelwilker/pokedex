@@ -5,6 +5,8 @@ function mockFetch(body, ok = true) {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok, status: ok ? 200 : 500, json: async () => body }))
 }
 
+const NO_SPRITES = { front: null, shiny: null, back: null, backShiny: null }
+
 afterEach(() => vi.unstubAllGlobals())
 
 test('fetchPokemonList extracts ids from urls', async () => {
@@ -26,8 +28,8 @@ test('fetchPokemon converts units and maps types and sprite', async () => {
     id: 1,
     name: 'bulbasaur',
     sprite: 'x.png',
-    sprites: { front: 'x.png', shiny: null, back: null, backShiny: null },
-    animated: { front: null, shiny: null, back: null, backShiny: null },
+    sprites: { front: 'x.png', shiny: null, back: null, backShiny: null, female: NO_SPRITES },
+    animated: { front: null, shiny: null, back: null, backShiny: null, female: NO_SPRITES },
     cry: null,
     types: ['grass', 'poison'],
     heightM: 0.7,

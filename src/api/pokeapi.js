@@ -31,7 +31,13 @@ function animatedSprites(sprites) {
     front: pick('front_default'),
     shiny: pick('front_shiny'),
     back: pick('back_default'),
-    backShiny: pick('back_shiny')
+    backShiny: pick('back_shiny'),
+    female: {
+      front: pick('front_female'),
+      shiny: pick('front_shiny_female'),
+      back: pick('back_female'),
+      backShiny: pick('back_shiny_female')
+    }
   }
 }
 
@@ -45,7 +51,13 @@ export async function fetchPokemon(id) {
       front: data.sprites?.front_default ?? null,
       shiny: data.sprites?.front_shiny ?? null,
       back: data.sprites?.back_default ?? null,
-      backShiny: data.sprites?.back_shiny ?? null
+      backShiny: data.sprites?.back_shiny ?? null,
+      female: {
+        front: data.sprites?.front_female ?? null,
+        shiny: data.sprites?.front_shiny_female ?? null,
+        back: data.sprites?.back_female ?? null,
+        backShiny: data.sprites?.back_shiny_female ?? null
+      }
     },
     animated: animatedSprites(data.sprites),
     cry: data.cries?.latest ?? data.cries?.legacy ?? null,
@@ -53,6 +65,12 @@ export async function fetchPokemon(id) {
     heightM: data.height / 10,
     weightKg: data.weight / 10
   }
+}
+
+// -1 = genderless, 0 = always male, 8 = always female, 1-7 = both (eighths female)
+export async function fetchGenderRate(id) {
+  const data = await getJson(`/pokemon-species/${id}`)
+  return typeof data.gender_rate === 'number' ? data.gender_rate : null
 }
 
 export async function fetchEntryText(id) {

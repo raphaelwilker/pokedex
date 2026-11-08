@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { fetchPokemonList, fetchPokemon, fetchEntryText } from '../api/pokeapi'
+import { fetchPokemonList, fetchPokemon, fetchEntryText, fetchGenderRate } from '../api/pokeapi'
 import { MAX_ID, generationOf, rangeFor } from '../data/generations'
 
 let requestToken = 0
@@ -17,6 +17,7 @@ export const usePokedexStore = defineStore('pokedex', {
     status: 'idle',
     shiny: false,
     back: false,
+    gender: 'male',
     searchError: false,
     listError: false,
     cache: {}
@@ -31,11 +32,36 @@ export const usePokedexStore = defineStore('pokedex', {
       return this.currentId < this.range.max
     },
     currentGeneration: (state) => generationOf(state.currentId),
-    currentSprite: (state) => {
+    // true when the current pokémon has a distinct female sprite
+    hasFemale: (state) => {
       const p = state.entry?.pokemon
+      return Boolean(p?.animated?.female?.front || p?.sprites?.female?.front)
+    },
+    // species gender rate: -1 genderless, 0 male only, 8 female only, 1-7 both; null = unknown
+    genderRate: (state) => state.entry?.genderRate ?? null,
+    canMale() {
+      const rate = this.genderRate
+      return this.entry?.pokemon ? (rate === null ? true : rate >= 0 && rate < 8) : false
+    },
+    canFemale() {
+      const rate = this.genderRate
+      if (!this.entry?.pokemon) return false
+      return rate === null ? this.hasFemale : rate > 0
+    },
+    // a female-only pokémon is always shown as female
+    isFemale() {
+      if (!this.canFemale) return false
+      return this.gender === 'female' || !this.canMale
+    },
+    currentSprite() {
+      const p = this.entry?.pokemon
       if (!p) return null
       const s = p.sprites ?? { front: p.sprite }
-      const key = state.back ? (state.shiny ? 'backShiny' : 'back') : state.shiny ? 'shiny' : 'front'
+      const key = this.back ? (this.shiny ? 'backShiny' : 'back') : this.shiny ? 'shiny' : 'front'
+      if (this.isFemale) {
+        const female = p.animated?.female?.[key] ?? s.female?.[key]
+        if (female) return female
+      }
       return p.animated?.[key] ?? s[key] ?? p.animated?.front ?? s.front ?? null
     }
   },
@@ -60,8 +86,16 @@ export const usePokedexStore = defineStore('pokedex', {
       try {
         let entry = this.cache[target]
         if (!entry) {
-          const [pokemon, text] = await Promise.all([fetchPokemon(target), fetchEntryText(target)])
-          entry = { pokemon, text }
+          const [pokemon, text, genderRate] = await Promise.all([
+            fetchPokemon(target),
+            fetchEntryText(target),
+            // the gender is optional info: a failure here must not break the entry
+            Promise.resolve()
+              .then(() => fetchGenderRate(target))
+              .then((rate) => (typeof rate === 'number' ? rate : null))
+              .catch(() => null)
+          ])
+          entry = { pokemon, text, genderRate }
           this.cache[target] = entry
         }
         if (token !== requestToken) return
@@ -121,6 +155,10 @@ export const usePokedexStore = defineStore('pokedex', {
 
     setShiny(value) {
       this.shiny = Boolean(value)
+    },
+
+    setGender(value) {
+      this.gender = value === 'female' ? 'female' : 'male'
     },
 
     toggleBack() {

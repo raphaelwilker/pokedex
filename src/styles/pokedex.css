@@ -26,7 +26,7 @@ body {
 
 .device {
   display: grid;
-  grid-template-columns: 1fr 6px 1fr;
+  grid-template-columns: minmax(0, 1fr) 6px minmax(0, 1fr);
   width: min(1020px, 100%);
   background: var(--red);
   border: 6px solid var(--ink);
@@ -35,7 +35,7 @@ body {
   overflow: hidden;
 }
 
-.half { padding: 28px; display: flex; flex-direction: column; gap: 20px; }
+.half { min-width: 0; padding: 28px; display: flex; flex-direction: column; gap: 20px; }
 .hinge { background: var(--ink); }
 
 /* left half */
@@ -61,8 +61,8 @@ body {
   background: linear-gradient(#c3ccb6, #222);
   display: grid; place-items: center;
 }
-.sprite { width: 240px; height: 240px; image-rendering: pixelated; object-fit: contain; }
-.sprite-box { display: grid; place-items: center; }
+.sprite { width: 190px; height: 190px; max-width: 100%; max-height: 100%; image-rendering: pixelated; object-fit: contain; }
+.sprite-box { display: grid; place-items: center; width: 100%; height: 100%; overflow: hidden; }
 
 .lcd-loading { color: #123; font-weight: bold; letter-spacing: 2px; }
 .number-lcd {
@@ -74,7 +74,7 @@ body {
 
 .deck { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; }
 .deck-left { display: flex; flex-direction: column; gap: 22px; }
-.deck-right { display: flex; flex-direction: column; align-items: flex-end; gap: 26px; }
+.deck-right { min-width: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 26px; }
 
 .cry-btn {
   width: 56px; height: 56px; border-radius: 50%; padding: 0;
@@ -82,14 +82,17 @@ body {
 }
 .cry-btn:active { background: #555; transform: translateY(2px); }
 
-.pills { display: flex; gap: 22px; }
+.pills { display: flex; flex-wrap: nowrap; justify-content: flex-end; gap: 10px; min-width: 0; }
 .pill {
-  width: 64px; height: 14px; border-radius: 8px; padding: 0;
+  flex: 0 1 44px; min-width: 24px; height: 14px; border-radius: 8px; padding: 0;
   border: 4px solid var(--ink); cursor: pointer; opacity: .6;
 }
 .pill.on { opacity: 1; box-shadow: 0 0 0 3px rgba(255, 255, 255, .55); }
+.pill:disabled, .pill.on:disabled { opacity: .3; box-shadow: none; cursor: not-allowed; }
 .pill-red { background: #b52020; }
 .pill-blue { background: #1f4fc0; }
+.pill-yellow { background: #e6b800; }
+.pill-green { background: #2e9e4f; }
 
 .dpad {
   display: grid; grid-template-columns: repeat(3, 32px); grid-template-rows: repeat(3, 32px);
@@ -145,6 +148,6 @@ body {
 .search-led { width: 14px; height: 14px; border-radius: 50%; background: #2ecc71; }
 
 @media (max-width: 800px) {
-  .device { grid-template-columns: 1fr; }
+  .device { grid-template-columns: minmax(0, 1fr); }
   .hinge { height: 6px; }
 }
