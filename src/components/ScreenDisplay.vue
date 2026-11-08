@@ -44,6 +44,24 @@ function playCry() {
           <button
             type="button"
             class="pill pill-red"
+            :class="{ on: store.isFemale }"
+            :disabled="!store.canFemale"
+            aria-label="Female sprite"
+            title="Female"
+            @click="store.setGender('female')"
+          ></button>
+          <button
+            type="button"
+            class="pill pill-blue"
+            :class="{ on: store.canMale && !store.isFemale }"
+            :disabled="!store.canMale"
+            aria-label="Male sprite"
+            title="Male"
+            @click="store.setGender('male')"
+          ></button>
+          <button
+            type="button"
+            class="pill pill-yellow"
             :class="{ on: store.shiny }"
             aria-label="Shiny sprite"
             title="Shiny"
@@ -51,7 +69,7 @@ function playCry() {
           ></button>
           <button
             type="button"
-            class="pill pill-blue"
+            class="pill pill-green"
             :class="{ on: !store.shiny }"
             aria-label="Normal sprite"
             title="Normal"
