@@ -15,4 +15,8 @@ npm test        # testes (Vitest)
 npm run build   # build de produção
 ```
 
+## Publicação (GitHub Pages)
+O deploy é automático: a cada push na `main`, o workflow `.github/workflows/deploy.yml` roda os testes, gera a build e publica.
+Em *Settings → Pages*, a origem (Source) deve ser **GitHub Actions**. O site fica em `https://<usuario>.github.io/pokedex/`.
+
 Spec e plano: `docs/superpowers/`.
