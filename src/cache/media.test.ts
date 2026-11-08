@@ -1,18 +1,27 @@
 import { test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { IDBFactory } from 'fake-indexeddb'
 
-// Lets a test make the next writes fail like a full disk would.
-const faults = { failNextSets: 0 }
+// Lets a test make the next writes fail like a full disk would. Each test gets a new
+// "generation": a background download left over by an earlier test belongs to an older
+// generation and can never consume the failures meant for the current test.
+const faults = { failNextSets: 0, generation: 0 }
 vi.mock('idb-keyval', async (importOriginal) => {
   const actual = await importOriginal<typeof import('idb-keyval')>()
+  type Tagged = ReturnType<typeof actual.createStore> & { generation?: number }
   return {
     ...actual,
-    set: (...args: Parameters<typeof actual.set>) => {
-      if (faults.failNextSets > 0) {
+    // every store remembers in which test it was created (the module is reloaded per test)
+    createStore: (...args: Parameters<typeof actual.createStore>) => {
+      const store: Tagged = actual.createStore(...args)
+      store.generation = faults.generation
+      return store
+    },
+    set: (key: IDBValidKey, value: unknown, store?: Tagged) => {
+      if (store?.generation === faults.generation && faults.failNextSets > 0) {
         faults.failNextSets--
         return Promise.reject(new DOMException('disk full', 'QuotaExceededError'))
       }
-      return actual.set(...args)
+      return actual.set(key, value, store)
     }
   }
 })
@@ -50,6 +59,7 @@ beforeEach(() => {
   now = 0
   blobCounter = 0
   faults.failNextSets = 0
+  faults.generation++
   vi.stubGlobal('indexedDB', new IDBFactory())
   vi.spyOn(Date, 'now').mockImplementation(() => ++now)
   URL.createObjectURL = vi.fn(() => `blob:mock-${++blobCounter}`)
