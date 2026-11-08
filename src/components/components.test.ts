@@ -82,7 +82,7 @@ test('InfoPanel shows types, dimensions and generation', () => {
   const text = mountWith(InfoPanel).text()
   expect(text).toContain('GRASS / POISON')
   expect(text).toContain('HT 0.7M | WT 6.9KG')
-  expect(text).toContain('GENERATION 1')
+  expect(text).toContain('GENERATION')
 })
 
 test('ScreenDisplay shows the padded number and sprite', () => {

@@ -8,6 +8,8 @@ const types = computed(() => (pokemon.value ? pokemon.value.types.join(' / ').to
 const dimensions = computed(() =>
   pokemon.value ? `HT ${pokemon.value.heightM}M | WT ${pokemon.value.weightKg}KG` : '---'
 )
+const generation = computed(() => String(store.currentGeneration))
+const region = computed(() => (store.currentRegion ? store.currentRegion.toUpperCase() : '---'))
 </script>
 
 <template>
@@ -22,9 +24,15 @@ const dimensions = computed(() =>
         <span class="lcd-value">{{ dimensions }}</span>
       </div>
     </div>
-    <div class="tags">
-      <div class="gen-tag">GENERATION {{ store.currentGeneration }}</div>
-      <div v-if="store.currentRegion" class="gen-tag region-tag">REGION {{ store.currentRegion.toUpperCase() }}</div>
+    <div class="info-row">
+      <div class="lcd-box">
+        <span class="lcd-label">GENERATION</span>
+        <span class="lcd-value">{{ generation }}</span>
+      </div>
+      <div class="lcd-box">
+        <span class="lcd-label">REGION</span>
+        <span class="lcd-value">{{ region }}</span>
+      </div>
     </div>
   </div>
 </template>
