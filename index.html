@@ -3,13 +3,88 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pokédex</title>
+
+    <title>Pokédex Online – Search Pokémon by Name, Number or Generation</title>
+    <meta
+      name="description"
+      content="Free online Pokédex built with Vue 3 and the PokéAPI. Browse all 1025 Pokémon from Gen 1 to Gen 9: animated sprites, shiny and gender forms, back view, cries, types, height, weight and Pokédex entries."
+    />
+    <meta
+      name="keywords"
+      content="pokedex, pokédex online, pokemon, pokémon database, pokeapi, pokemon sprites, shiny pokemon, pokemon cry, pokemon generations, vue 3 pokedex"
+    />
+    <meta name="author" content="Raphael Wilker Mendes Araújo" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="theme-color" content="#dc0a2d" />
+    <link rel="canonical" href="https://raphaelwilker.github.io/pokedex/" />
+    <link rel="icon" type="image/png" sizes="128x128" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
+
+    <!-- Open Graph (Facebook, LinkedIn, WhatsApp, Discord...) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Pokédex" />
+    <meta property="og:title" content="Pokédex Online – Search Pokémon by Name, Number or Generation" />
+    <meta
+      property="og:description"
+      content="Browse all 1025 Pokémon with animated sprites, shiny and gender forms, cries, types and Pokédex entries. Built with Vue 3 and the PokéAPI."
+    />
+    <meta property="og:url" content="https://raphaelwilker.github.io/pokedex/" />
+    <meta property="og:image" content="https://raphaelwilker.github.io/pokedex/og-image.png" />
+    <meta property="og:image:width" content="1600" />
+    <meta property="og:image:height" content="840" />
+    <meta property="og:image:alt" content="Pokédex device showing Pikachu with its entry, type and dimensions" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Pokédex Online – Search Pokémon by Name, Number or Generation" />
+    <meta
+      name="twitter:description"
+      content="Browse all 1025 Pokémon with animated sprites, shiny and gender forms, cries, types and Pokédex entries."
+    />
+    <meta name="twitter:image" content="https://raphaelwilker.github.io/pokedex/og-image.png" />
+
+    <!-- Structured data (search engines and AI assistants) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Pokédex",
+        "alternateName": "Pokédex Online",
+        "url": "https://raphaelwilker.github.io/pokedex/",
+        "description": "Free online Pokédex built with Vue 3 and the PokéAPI. Browse all 1025 Pokémon from Gen 1 to Gen 9 with animated sprites, shiny and gender forms, cries, types, height, weight and Pokédex entries.",
+        "applicationCategory": "EntertainmentApplication",
+        "operatingSystem": "Any (web browser)",
+        "browserRequirements": "Requires JavaScript",
+        "inLanguage": "en",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "image": "https://raphaelwilker.github.io/pokedex/og-image.png",
+        "author": { "@type": "Person", "name": "Raphael Wilker Mendes Araújo", "url": "https://github.com/raphaelwilker" },
+        "codeRepository": "https://github.com/raphaelwilker/pokedex",
+        "keywords": "pokedex, pokemon, pokeapi, vue 3, sprites, shiny, generations"
+      }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet" />
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <!-- Fallback content for crawlers and browsers without JavaScript; Vue replaces it on load. -->
+      <main>
+        <h1>Pokédex Online</h1>
+        <p>
+          Free Pokédex built with Vue 3 and the <a href="https://pokeapi.co/">PokéAPI</a>. Browse all 1025 Pokémon
+          from Generation 1 to Generation 9, search by name or number, and see animated sprites, shiny and gender
+          forms, back view, cries, types, height, weight and Pokédex entries.
+        </p>
+        <p>This app needs JavaScript enabled to run.</p>
+        <p><a href="https://github.com/raphaelwilker/pokedex">Source code on GitHub</a></p>
+      </main>
+    </div>
+    <noscript>Pokédex Online needs JavaScript enabled to show Pokémon data.</noscript>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

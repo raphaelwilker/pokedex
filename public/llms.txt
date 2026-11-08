@@ -1,0 +1,24 @@
+# Pokédex
+
+> Free online Pokédex built with Vue 3, Pinia and Vite, using data from the PokéAPI. Browse all 1025 Pokémon (Generation 1 to 9) in a Game Boy-style device UI.
+
+Live app: https://raphaelwilker.github.io/pokedex/
+Source code: https://github.com/raphaelwilker/pokedex
+Author: Raphael Wilker Mendes Araújo
+
+## What it does
+- Shows one Pokémon at a time: name, Pokédex number, entry text, types, height and weight.
+- Search by name or number (e.g. "pikachu" or "#25"); filter navigation by generation (G1–G9 or ALL).
+- Animated sprites (Gen V and Pokémon Showdown GIFs) with static fallback.
+- Shiny and normal forms, male and female forms (when the species differs), front and back views.
+- Plays the Pokémon's cry.
+- Device controls: D-pad (left/right = previous/next Pokémon, up/down = flip front/back), colored buttons for gender and shiny, round button for the cry.
+- Deep links use the URL hash, e.g. https://raphaelwilker.github.io/pokedex/#/pokemon/25
+
+## Tech
+- Vue 3, Pinia, Vue Router (hash history), Vite, Vitest.
+- Data source: https://pokeapi.co/ (Pokémon, species and sprite data).
+- Deployed to GitHub Pages with GitHub Actions.
+
+## Notes
+- Unofficial fan project. Pokémon and its characters are trademarks of Nintendo, Game Freak and The Pokémon Company.
