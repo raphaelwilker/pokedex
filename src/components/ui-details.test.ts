@@ -45,21 +45,32 @@ test('the d-pad is a single cross shape with four arrow buttons', () => {
   }
 })
 
-test('InfoPanel shows generation and region', () => {
+// label/value pairs of the LCD boxes, e.g. { TYPE: 'GRASS', GENERATION: '1', REGION: 'KANTO' }
+function boxes(): Record<string, string> {
+  const wrapper = mount(InfoPanel, { global: { plugins: [pinia] } })
+  const result: Record<string, string> = {}
+  for (const box of wrapper.findAll('.lcd-box')) {
+    result[box.find('.lcd-label').text()] = box.find('.lcd-value').text()
+  }
+  return result
+}
+
+test('InfoPanel shows generation and region in the same LCD format as type and dimensions', () => {
   store.currentId = 25
-  const text = mount(InfoPanel, { global: { plugins: [pinia] } }).text()
-  expect(text).toContain('GENERATION 1')
-  expect(text).toContain('REGION KANTO')
+  const info = boxes()
+  expect(Object.keys(info)).toEqual(['TYPE', 'DIMENSIONS', 'GENERATION', 'REGION'])
+  expect(info.GENERATION).toBe('1')
+  expect(info.REGION).toBe('KANTO')
 })
 
 test.each([
-  [152, 'GENERATION 2', 'REGION JOHTO'],
-  [387, 'GENERATION 4', 'REGION SINNOH'],
-  [1000, 'GENERATION 9', 'REGION PALDEA']
-])('InfoPanel for #%i shows %s and %s', (id, gen, region) => {
+  [152, '2', 'JOHTO'],
+  [387, '4', 'SINNOH'],
+  [1000, '9', 'PALDEA']
+])('InfoPanel for #%i shows generation %s and region %s', (id, gen, region) => {
   store.currentId = id
   store.entry = { pokemon: pokemon(id), text: '' }
-  const text = mount(InfoPanel, { global: { plugins: [pinia] } }).text()
-  expect(text).toContain(gen)
-  expect(text).toContain(region)
+  const info = boxes()
+  expect(info.GENERATION).toBe(gen)
+  expect(info.REGION).toBe(region)
 })
