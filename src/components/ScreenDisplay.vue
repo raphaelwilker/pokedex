@@ -27,7 +27,9 @@ function playCry() {
     <div class="screen">
       <div class="lcd">
         <span v-if="store.status === 'loading'" class="lcd-loading">LOADING...</span>
-        <img v-else-if="sprite" :src="sprite" :alt="store.entry.pokemon.name" class="sprite" />
+        <div v-else-if="sprite" class="sprite-box">
+          <img :src="sprite" :alt="store.entry.pokemon.name" class="sprite" />
+        </div>
       </div>
     </div>
 

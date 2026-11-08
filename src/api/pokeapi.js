@@ -22,6 +22,19 @@ export async function fetchPokemonList() {
   }))
 }
 
+// Animated GIFs: Gen V (Pokémon up to #649) first, then Showdown (wider coverage).
+function animatedSprites(sprites) {
+  const gen5 = sprites?.versions?.['generation-v']?.['black-white']?.animated
+  const showdown = sprites?.other?.showdown
+  const pick = (key) => gen5?.[key] ?? showdown?.[key] ?? null
+  return {
+    front: pick('front_default'),
+    shiny: pick('front_shiny'),
+    back: pick('back_default'),
+    backShiny: pick('back_shiny')
+  }
+}
+
 export async function fetchPokemon(id) {
   const data = await getJson(`/pokemon/${id}`)
   return {
@@ -34,6 +47,7 @@ export async function fetchPokemon(id) {
       back: data.sprites?.back_default ?? null,
       backShiny: data.sprites?.back_shiny ?? null
     },
+    animated: animatedSprites(data.sprites),
     cry: data.cries?.latest ?? data.cries?.legacy ?? null,
     types: data.types.map((t) => t.type.name),
     heightM: data.height / 10,

@@ -27,6 +27,7 @@ test('fetchPokemon converts units and maps types and sprite', async () => {
     name: 'bulbasaur',
     sprite: 'x.png',
     sprites: { front: 'x.png', shiny: null, back: null, backShiny: null },
+    animated: { front: null, shiny: null, back: null, backShiny: null },
     cry: null,
     types: ['grass', 'poison'],
     heightM: 0.7,
