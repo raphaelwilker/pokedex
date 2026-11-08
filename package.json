@@ -12,7 +12,7 @@
     "test": "vitest run",
     "cap:sync": "npm run build && cap sync",
     "android:apk": "npm run cap:sync && cd android && gradlew assembleDebug",
-    "icons": "capacitor-assets generate --assetPath resources"
+    "icons": "capacitor-assets generate --assetPath resources --android --ios"
   },
   "repository": {
     "type": "git",
