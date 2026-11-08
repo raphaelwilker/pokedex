@@ -183,6 +183,7 @@ test('a load in progress does not show the previous entry', async () => {
   fetchPokemon.mockImplementationOnce(() => new Promise((r) => { release = r }))
   const pending = store.select(26)
   expect(store.entry).toBe(null)
+  await vi.waitFor(() => expect(release).toBeTypeOf('function')) // the cache is read before the API is called
   release({ id: 26, name: 'p26', sprite: null, types: [], heightM: 1, weightKg: 1 })
   await pending
   expect(store.entry.pokemon.id).toBe(26)

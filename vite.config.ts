@@ -7,5 +7,5 @@ export default defineConfig({
   plugins: [vue()],
   server: { port: 3000, strictPort: false },
   preview: { port: 3000, strictPort: false },
-  test: { environment: 'jsdom' }
+  test: { environment: 'jsdom', setupFiles: ['./src/test-setup.ts'] }
 })
