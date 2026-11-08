@@ -59,19 +59,27 @@ O servidor sobe na porta 3000. Se ela estiver ocupada, usa a 3001, depois a 3002
 | `npm run typecheck` | Verificação de tipos (código e testes) |
 | `npm run build` | Verifica os tipos e gera a build de produção em `dist/` |
 | `npm run preview` | Serve a build localmente |
+| `npm run cap:sync` | Gera a build e copia para os apps (`android/` e `ios/`) |
+| `npm run android:apk` | Gera o APK de debug do Android (precisa de JDK 21 e Android Studio) |
+| `npm run icons` | Gera ícones e splash dos apps a partir de `resources/` |
 
 ## Estrutura
 
 ```
 src/
 ├── api/          # cliente da PokéAPI (pokeapi.ts)
+├── cache/        # cache permanente (IndexedDB): dados e mídia já vistos
 ├── components/   # componentes Vue (tela, cruz, botões, painéis)
 ├── data/         # gerações e regiões
+├── native/       # o que só existe no app (vibração, barra de status, splash)
 ├── router/       # rotas e sincronização com a store
 ├── stores/       # store Pinia (estado e lógica da Pokédex)
 ├── styles/       # CSS do aparelho
 ├── types.ts      # tipos compartilhados
 └── main.ts
+android/          # projeto Android (Capacitor)
+ios/              # projeto iOS (Capacitor)
+resources/        # imagens de origem do ícone e da splash
 public/           # favicon, imagem de pré-visualização, robots.txt, sitemap.xml e llms.txt
 ```
 
@@ -84,6 +92,20 @@ O deploy é automático: a cada push na `main`, o workflow [`.github/workflows/d
 Em *Settings → Pages*, a origem (**Source**) deve ser **GitHub Actions**.
 
 As rotas usam `#` (hash) e os caminhos da build são relativos, para funcionar no GitHub Pages sem configuração de servidor.
+
+## App para celular (Android e iOS)
+
+O mesmo código vira app com o [Capacitor](https://capacitorjs.com/) (sucessor do Cordova/PhoneGap): o `dist/` é copiado para dentro dos projetos `android/` e `ios/`. O app abre sem internet, e os Pokémon, sprites e cries que você já viu ficam guardados no aparelho (até ~50 MB de mídia) e continuam disponíveis offline. Isso vale também para o site.
+
+**Android**
+- Sem instalar nada: na aba **Actions** do GitHub, abra a execução mais recente do workflow *Mobile builds* e baixe o arquivo `pokedex-debug-apk`.
+- No seu computador: instale o JDK 21 e o Android Studio e rode `npm run android:apk`. O arquivo fica em `android/app/build/outputs/apk/debug/app-debug.apk`.
+- Para instalar, copie o APK para o celular e permita instalar de "fontes desconhecidas".
+
+**iOS**
+- O projeto compila no GitHub Actions (Mac virtual), **sem assinatura**, para o simulador. Isso confirma que o projeto está saudável, mas não instala em iPhone real nem vai para a App Store: isso exige uma conta Apple Developer.
+
+**Não incluído ainda:** assinatura e publicação na Play Store e na App Store.
 
 ## SEO
 
