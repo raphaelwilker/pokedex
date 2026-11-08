@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { usePokedexStore } from '../stores/pokedex'
 
 const store = usePokedexStore()

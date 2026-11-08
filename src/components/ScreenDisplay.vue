@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { usePokedexStore } from '../stores/pokedex'
 
@@ -6,8 +6,8 @@ const store = usePokedexStore()
 const number = computed(() => `NO. ${String(store.currentId).padStart(4, '0')}`)
 const sprite = computed(() => store.currentSprite)
 
-let audio = null
-function playCry() {
+let audio: HTMLAudioElement | null = null
+function playCry(): void {
   const url = store.entry?.pokemon?.cry
   if (!url) return
   try {
@@ -28,62 +28,89 @@ function playCry() {
       <div class="lcd">
         <span v-if="store.status === 'loading'" class="lcd-loading">LOADING...</span>
         <div v-else-if="sprite" class="sprite-box">
-          <img :src="sprite" :alt="store.entry.pokemon.name" class="sprite" />
+          <img :src="sprite" :alt="store.entry?.pokemon.name" class="sprite" />
         </div>
       </div>
     </div>
 
     <div class="deck">
-      <div class="deck-left">
-        <button type="button" class="cry-btn" aria-label="Play cry" title="Cry" @click="playCry"></button>
-        <div class="number-lcd">{{ number }}</div>
+      <button type="button" class="cry-btn" aria-label="Play cry" title="Cry" @click="playCry"></button>
+      <div class="number-lcd">{{ number }}</div>
+
+      <div class="pills">
+        <button
+          type="button"
+          class="pill pill-red"
+          :class="{ on: store.isFemale }"
+          :disabled="!store.canFemale"
+          aria-label="Female sprite"
+          @click="store.setGender('female')"
+        >
+          Female ♀
+        </button>
+        <button
+          type="button"
+          class="pill pill-blue"
+          :class="{ on: store.canMale && !store.isFemale }"
+          :disabled="!store.canMale"
+          aria-label="Male sprite"
+          @click="store.setGender('male')"
+        >
+          Male ♂
+        </button>
+        <button
+          type="button"
+          class="pill pill-yellow"
+          :class="{ on: store.shiny }"
+          aria-label="Shiny sprite"
+          @click="store.setShiny(true)"
+        >
+          Shiny
+        </button>
+        <button
+          type="button"
+          class="pill pill-green"
+          :class="{ on: !store.shiny }"
+          aria-label="Normal sprite"
+          @click="store.setShiny(false)"
+        >
+          Comum
+        </button>
       </div>
 
-      <div class="deck-right">
-        <div class="pills">
-          <button
-            type="button"
-            class="pill pill-red"
-            :class="{ on: store.isFemale }"
-            :disabled="!store.canFemale"
-            aria-label="Female sprite"
-            title="Female"
-            @click="store.setGender('female')"
-          ></button>
-          <button
-            type="button"
-            class="pill pill-blue"
-            :class="{ on: store.canMale && !store.isFemale }"
-            :disabled="!store.canMale"
-            aria-label="Male sprite"
-            title="Male"
-            @click="store.setGender('male')"
-          ></button>
-          <button
-            type="button"
-            class="pill pill-yellow"
-            :class="{ on: store.shiny }"
-            aria-label="Shiny sprite"
-            title="Shiny"
-            @click="store.setShiny(true)"
-          ></button>
-          <button
-            type="button"
-            class="pill pill-green"
-            :class="{ on: !store.shiny }"
-            aria-label="Normal sprite"
-            title="Normal"
-            @click="store.setShiny(false)"
-          ></button>
-        </div>
-
-        <div class="dpad">
-          <button type="button" class="dp dp-up" aria-label="Flip sprite" @click="store.toggleBack()"></button>
-          <button type="button" class="dp dp-left" aria-label="Previous" :disabled="!store.canPrev" @click="store.prev()"></button>
-          <span class="dp dp-center"></span>
-          <button type="button" class="dp dp-right" aria-label="Next" :disabled="!store.canNext" @click="store.next()"></button>
-          <button type="button" class="dp dp-down" aria-label="Flip sprite" @click="store.toggleBack()"></button>
-        </div>
+      <div class="dpad">
+        <svg class="dpad-shape" viewBox="0 0 102 102" aria-hidden="true">
+          <defs>
+            <linearGradient id="dpad-body" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#3a3a3a" />
+              <stop offset="1" stop-color="#2e2e2e" />
+            </linearGradient>
+            <radialGradient id="dpad-hub" cx="0.35" cy="0.3" r="0.8">
+              <stop offset="0" stop-color="#555" />
+              <stop offset="1" stop-color="#333" />
+            </radialGradient>
+          </defs>
+          <!-- one single cross shape: no seams or squares between the arms -->
+          <path
+            d="M36 4H66V36H98V66H66V98H36V66H4V36H36Z"
+            fill="var(--ink)"
+            stroke="var(--ink)"
+            stroke-width="8"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M36 4H66V36H98V66H66V98H36V66H4V36H36Z"
+            fill="url(#dpad-body)"
+            stroke="url(#dpad-body)"
+            stroke-width="2"
+            stroke-linejoin="round"
+          />
+          <circle cx="51" cy="51" r="8" fill="url(#dpad-hub)" stroke="var(--ink)" stroke-width="2" />
+        </svg>
+        <button type="button" class="dp dp-up" aria-label="Flip sprite" @click="store.toggleBack()"></button>
+        <button type="button" class="dp dp-left" aria-label="Previous" :disabled="!store.canPrev" @click="store.prev()"></button>
+        <button type="button" class="dp dp-right" aria-label="Next" :disabled="!store.canNext" @click="store.next()"></button>
+        <button type="button" class="dp dp-down" aria-label="Flip sprite" @click="store.toggleBack()"></button>
       </div>
     </div>
   </div>

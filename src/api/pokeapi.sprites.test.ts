@@ -118,7 +118,7 @@ test('uses the latest cry, then legacy, then null', async () => {
 test('fetchGenderRate returns the species gender rate, or null when missing', async () => {
   mockFetch({ gender_rate: 8 })
   expect(await fetchGenderRate(29)).toBe(8)
-  expect(fetch.mock.calls[0][0]).toContain('/pokemon-species/29')
+  expect(vi.mocked(fetch).mock.calls[0][0]).toContain('/pokemon-species/29')
   mockFetch({ gender_rate: -1 })
   expect(await fetchGenderRate(132)).toBe(-1)
   mockFetch({})

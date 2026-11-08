@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { watchEffect } from 'vue'
 import PokedexShell from './components/PokedexShell.vue'
 import { usePokedexStore } from './stores/pokedex'

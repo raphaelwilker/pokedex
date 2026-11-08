@@ -1,0 +1,12 @@
+{
+  // Tests are type-checked too, but with looser rules: they build partial
+  // fixtures and mocks on purpose.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "strict": false,
+    "noImplicitAny": false,
+    "types": ["vite/client"]
+  },
+  "include": ["src/**/*.test.ts", "src/**/*.d.ts", "src/types.ts"],
+  "exclude": []
+}

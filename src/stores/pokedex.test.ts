@@ -7,7 +7,10 @@ vi.mock('../api/pokeapi', () => ({
   fetchEntryText: vi.fn()
 }))
 
-import { fetchPokemonList, fetchPokemon, fetchEntryText } from '../api/pokeapi'
+import * as api from '../api/pokeapi'
+const fetchPokemonList = vi.mocked(api.fetchPokemonList)
+const fetchPokemon = vi.mocked(api.fetchPokemon)
+const fetchEntryText = vi.mocked(api.fetchEntryText)
 import { usePokedexStore } from './pokedex'
 
 const LIST = [
@@ -25,7 +28,7 @@ function makeStore() {
 beforeEach(() => {
   setActivePinia(createPinia())
   fetchPokemonList.mockReset().mockResolvedValue(LIST)
-  fetchPokemon.mockReset().mockImplementation(async (id) => ({ id, name: `p${id}`, sprite: null, types: ['grass'], heightM: 1, weightKg: 1 }))
+  fetchPokemon.mockReset().mockImplementation(async (id) => ({ id, name: `p${id}`, sprite: null, types: ['grass'], heightM: 1, weightKg: 1 } as never))
   fetchEntryText.mockReset().mockResolvedValue('text')
 })
 

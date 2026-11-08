@@ -8,12 +8,15 @@ vi.mock('../api/pokeapi', () => ({
   fetchGenderRate: vi.fn()
 }))
 
-import { fetchPokemon, fetchEntryText, fetchGenderRate } from '../api/pokeapi'
+import * as api from '../api/pokeapi'
+const fetchPokemon = vi.mocked(api.fetchPokemon)
+const fetchEntryText = vi.mocked(api.fetchEntryText)
+const fetchGenderRate = vi.mocked(api.fetchGenderRate)
 import { usePokedexStore } from './pokedex'
 
 beforeEach(() => {
   setActivePinia(createPinia())
-  fetchPokemon.mockReset().mockImplementation(async (id) => ({ id, name: `p${id}`, sprite: null, types: [], heightM: 1, weightKg: 1 }))
+  fetchPokemon.mockReset().mockImplementation(async (id) => ({ id, name: `p${id}`, sprite: null, types: [], heightM: 1, weightKg: 1 } as never))
   fetchEntryText.mockReset().mockResolvedValue('text')
   fetchGenderRate.mockReset().mockResolvedValue(4)
 })
@@ -79,7 +82,7 @@ test('currentSprite falls back to the front sprite when an angle is missing', ()
 
 test('currentSprite works with entries that only have `sprite`', () => {
   const store = usePokedexStore()
-  store.entry = { pokemon: { id: 1, name: 'p1', sprite: 'legacy.png' }, text: '' }
+  store.entry = { pokemon: { id: 1, name: 'p1', sprite: 'legacy.png' }, text: '' } as never
   expect(store.currentSprite).toBe('legacy.png')
 })
 

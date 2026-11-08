@@ -8,7 +8,9 @@ vi.mock('../api/pokeapi', () => ({
   fetchEntryText: vi.fn()
 }))
 
-import { fetchPokemon, fetchEntryText } from '../api/pokeapi'
+import * as api from '../api/pokeapi'
+const fetchPokemon = vi.mocked(api.fetchPokemon)
+const fetchEntryText = vi.mocked(api.fetchEntryText)
 import { usePokedexStore } from '../stores/pokedex'
 import ScreenDisplay from './ScreenDisplay.vue'
 
@@ -30,7 +32,7 @@ function setPokemon(extra = {}) {
 beforeEach(() => {
   pinia = createPinia()
   setActivePinia(pinia)
-  fetchPokemon.mockReset().mockImplementation(async (id) => ({ id, name: `p${id}`, sprite: 'x.png', sprites: SPRITES, types: [], heightM: 1, weightKg: 1 }))
+  fetchPokemon.mockReset().mockImplementation(async (id) => ({ id, name: `p${id}`, sprite: 'x.png', sprites: SPRITES, types: [], heightM: 1, weightKg: 1 } as never))
   fetchEntryText.mockReset().mockResolvedValue('text')
   store = usePokedexStore()
   store.currentId = 1

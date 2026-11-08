@@ -16,7 +16,7 @@ Author: Raphael Wilker Mendes Araújo
 - Deep links use the URL hash, e.g. https://raphaelwilker.github.io/pokedex/#/pokemon/25
 
 ## Tech
-- Vue 3, Pinia, Vue Router (hash history), Vite, Vitest.
+- TypeScript, Vue 3, Pinia, Vue Router (hash history), Vite, Vitest.
 - Data source: https://pokeapi.co/ (Pokémon, species and sprite data).
 - Deployed to GitHub Pages with GitHub Actions.
 

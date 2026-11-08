@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import ScreenDisplay from './ScreenDisplay.vue'
 import EntryText from './EntryText.vue'
 import GenerationPicker from './GenerationPicker.vue'

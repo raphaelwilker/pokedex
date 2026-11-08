@@ -12,6 +12,7 @@ Pokédex em Vue 3 que consome a [PokéAPI](https://pokeapi.co/), com layout de a
 npm install
 npm run dev     # servidor de desenvolvimento
 npm test        # testes (Vitest)
+npm run typecheck # verificação de tipos (TypeScript)
 npm run build   # build de produção
 ```
 
