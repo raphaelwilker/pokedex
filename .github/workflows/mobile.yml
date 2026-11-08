@@ -42,3 +42,39 @@ jobs:
           name: pokedex-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+  ios:
+    name: iOS (simulator build, unsigned)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      # Capacitor 8 needs a recent Xcode
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - run: npm ci
+      - run: npm run build
+      - run: npx cap sync ios
+      - name: Build for the iOS simulator (no code signing)
+        run: |
+          xcodebuild \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -derivedDataPath ios/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+      - name: Zip the simulator app
+        run: |
+          cd ios/DerivedData/Build/Products/Debug-iphonesimulator
+          zip -r "$GITHUB_WORKSPACE/pokedex-ios-simulator.zip" App.app
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pokedex-ios-simulator
+          path: pokedex-ios-simulator.zip
+          if-no-files-found: error
