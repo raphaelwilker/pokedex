@@ -1,16 +1,16 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { usePokedexStore } from '../stores/pokedex'
 
 const store = usePokedexStore()
 const query = ref('')
 
-function onInput() {
+function onInput(): void {
   store.searchError = false
   store.listError = false
 }
 
-function submit() {
+function submit(): void {
   store.search(query.value)
 }
 </script>

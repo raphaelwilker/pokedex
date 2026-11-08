@@ -12,7 +12,7 @@ afterEach(() => vi.unstubAllGlobals())
 test('fetchPokemonList extracts ids from urls', async () => {
   mockFetch({ results: [{ name: 'bulbasaur', url: 'https://pokeapi.co/api/v2/pokemon-species/1/' }] })
   expect(await fetchPokemonList()).toEqual([{ id: 1, name: 'bulbasaur' }])
-  expect(fetch.mock.calls[0][0]).toContain('/pokemon-species?limit=1025')
+  expect(vi.mocked(fetch).mock.calls[0][0]).toContain('/pokemon-species?limit=1025')
 })
 
 test('fetchPokemon converts units and maps types and sprite', async () => {

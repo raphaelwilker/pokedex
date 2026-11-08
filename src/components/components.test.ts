@@ -8,7 +8,10 @@ vi.mock('../api/pokeapi', () => ({
   fetchEntryText: vi.fn()
 }))
 
-import { fetchPokemonList, fetchPokemon, fetchEntryText } from '../api/pokeapi'
+import * as api from '../api/pokeapi'
+const fetchPokemonList = vi.mocked(api.fetchPokemonList)
+const fetchPokemon = vi.mocked(api.fetchPokemon)
+const fetchEntryText = vi.mocked(api.fetchEntryText)
 import { usePokedexStore } from '../stores/pokedex'
 import GenerationPicker from './GenerationPicker.vue'
 import SearchField from './SearchField.vue'
@@ -29,7 +32,7 @@ beforeEach(() => {
   pinia = createPinia()
   setActivePinia(pinia)
   fetchPokemonList.mockReset().mockResolvedValue([{ id: 25, name: 'pikachu' }])
-  fetchPokemon.mockReset().mockImplementation(async (id) => ({ ...BULBASAUR, id, name: `p${id}` }))
+  fetchPokemon.mockReset().mockImplementation(async (id) => ({ ...BULBASAUR, id, name: `p${id}` } as never))
   fetchEntryText.mockReset().mockResolvedValue('a text')
   store = usePokedexStore()
   store.entry = { pokemon: BULBASAUR, text: 'A strange seed.' }

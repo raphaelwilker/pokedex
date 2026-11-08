@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { usePokedexStore } from '../stores/pokedex'
 
@@ -22,6 +22,9 @@ const dimensions = computed(() =>
         <span class="lcd-value">{{ dimensions }}</span>
       </div>
     </div>
-    <div class="gen-tag">GENERATION {{ store.currentGeneration }}</div>
+    <div class="tags">
+      <div class="gen-tag">GENERATION {{ store.currentGeneration }}</div>
+      <div v-if="store.currentRegion" class="gen-tag region-tag">REGION {{ store.currentRegion.toUpperCase() }}</div>
+    </div>
   </div>
 </template>
