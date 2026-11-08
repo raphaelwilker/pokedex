@@ -15,6 +15,8 @@ export const usePokedexStore = defineStore('pokedex', {
     generationKey: 'ALL',
     entry: null,
     status: 'idle',
+    shiny: false,
+    back: false,
     searchError: false,
     listError: false,
     cache: {}
@@ -28,7 +30,16 @@ export const usePokedexStore = defineStore('pokedex', {
     canNext() {
       return this.currentId < this.range.max
     },
-    currentGeneration: (state) => generationOf(state.currentId)
+    currentGeneration: (state) => generationOf(state.currentId),
+    currentSprite: (state) => {
+      const p = state.entry?.pokemon
+      if (!p) return null
+      const s = p.sprites ?? { front: p.sprite }
+      const pick = state.back
+        ? (state.shiny ? s.backShiny : s.back)
+        : (state.shiny ? s.shiny : s.front)
+      return pick ?? s.front ?? null
+    }
   },
 
   actions: {
@@ -108,6 +119,14 @@ export const usePokedexStore = defineStore('pokedex', {
       if (id < min || id > max) this.generationKey = 'ALL'
       await this.select(id)
       return true
+    },
+
+    setShiny(value) {
+      this.shiny = Boolean(value)
+    },
+
+    toggleBack() {
+      this.back = !this.back
     },
 
     async retry() {

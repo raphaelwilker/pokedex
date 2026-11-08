@@ -6,6 +6,7 @@
   --lcd-green: #4caf5f;
   --blue: #4aa8ff;
   --mono: 'Courier New', ui-monospace, monospace;
+  --pixel: 'Share Tech Mono', 'Courier New', monospace;
 }
 
 * { box-sizing: border-box; }
@@ -60,13 +61,45 @@ body {
   background: linear-gradient(#c3ccb6, #222);
   display: grid; place-items: center;
 }
-.sprite { width: 160px; height: 160px; image-rendering: pixelated; object-fit: contain; }
+.sprite { width: 240px; height: 240px; image-rendering: pixelated; object-fit: contain; }
 .lcd-loading { color: #123; font-weight: bold; letter-spacing: 2px; }
 .number-lcd {
   align-self: flex-start; background: #52b062; color: var(--ink);
   border: 5px solid var(--ink); border-radius: 8px;
   padding: 10px 22px; font-size: 22px; font-weight: bold;
+  font-family: var(--pixel); letter-spacing: 1px;
 }
+
+.deck { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; }
+.deck-left { display: flex; flex-direction: column; gap: 22px; }
+.deck-right { display: flex; flex-direction: column; align-items: flex-end; gap: 26px; }
+
+.cry-btn {
+  width: 56px; height: 56px; border-radius: 50%; padding: 0;
+  background: #333; border: 5px solid var(--ink); cursor: pointer;
+}
+.cry-btn:active { background: #555; transform: translateY(2px); }
+
+.pills { display: flex; gap: 22px; }
+.pill {
+  width: 64px; height: 14px; border-radius: 8px; padding: 0;
+  border: 4px solid var(--ink); cursor: pointer; opacity: .6;
+}
+.pill.on { opacity: 1; box-shadow: 0 0 0 3px rgba(255, 255, 255, .55); }
+.pill-red { background: #b52020; }
+.pill-blue { background: #1f4fc0; }
+
+.dpad {
+  display: grid; grid-template-columns: repeat(3, 32px); grid-template-rows: repeat(3, 32px);
+}
+.dp { background: #333; border: 4px solid var(--ink); padding: 0; cursor: pointer; }
+.dp:active:not(:disabled) { background: #555; }
+.dp:disabled { cursor: not-allowed; background: #666; }
+.dp-up { grid-area: 1 / 2; border-radius: 6px 6px 0 0; border-bottom: 0; }
+.dp-down { grid-area: 3 / 2; border-radius: 0 0 6px 6px; border-top: 0; }
+.dp-left { grid-area: 2 / 1; border-radius: 6px 0 0 6px; border-right: 0; }
+.dp-right { grid-area: 2 / 3; border-radius: 0 6px 6px 0; border-left: 0; }
+.dp-center { grid-area: 2 / 2; background: #333; border-top: 4px solid var(--ink); border-bottom: 4px solid var(--ink); }
 
 /* right half */
 .entry-label { color: #ffd6dd; font-size: 11px; font-weight: bold; letter-spacing: 1px; }
