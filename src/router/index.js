@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import { watch } from 'vue'
 import { MAX_ID } from '../data/generations'
 
@@ -9,7 +9,9 @@ export function parseId(raw) {
   return Number.isInteger(n) && n >= 1 && n <= MAX_ID ? n : 1
 }
 
-export function createAppRouter(history = createWebHistory()) {
+// Hash history (/#/pokemon/25) works on static hosts such as GitHub Pages,
+// which have no server-side fallback for deep links.
+export function createAppRouter(history = createWebHashHistory()) {
   const router = createRouter({
     history,
     routes: [
