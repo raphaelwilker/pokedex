@@ -3,6 +3,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import { createAppRouter, syncRouteWithStore } from './router'
 import { usePokedexStore } from './stores/pokedex'
+import { initNative } from './native/init'
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -15,4 +16,5 @@ router.isReady().then(() => {
   syncRouteWithStore(router, store)
   store.init()
   app.mount('#app')
+  void initNative() // status bar and splash screen in the native app; nothing in a browser
 })
