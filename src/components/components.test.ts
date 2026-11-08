@@ -85,8 +85,9 @@ test('InfoPanel shows types, dimensions and generation', () => {
   expect(text).toContain('GENERATION')
 })
 
-test('ScreenDisplay shows the padded number and sprite', () => {
+test('ScreenDisplay shows the padded number and sprite', async () => {
   const wrapper = mountWith(ScreenDisplay)
+  await flushPromises() // the sprite address is resolved asynchronously (local copy or original)
   expect(wrapper.text()).toContain('NO. 0001')
   expect(wrapper.find('img').attributes('src')).toBe('b.png')
 })

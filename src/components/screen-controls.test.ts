@@ -51,10 +51,13 @@ const FEMALE = { front: 'ff.png', shiny: 'ffs.png', back: 'fb.png', backShiny: '
 
 test('yellow pill shows shiny and green pill shows normal', async () => {
   const wrapper = mountScreen()
+  await flushPromises() // the sprite address is resolved asynchronously
   expect(wrapper.find('img').attributes('src')).toBe('f.png')
   await wrapper.find('.pill-yellow').trigger('click')
+  await flushPromises()
   expect(wrapper.find('img').attributes('src')).toBe('fs.png')
   await wrapper.find('.pill-green').trigger('click')
+  await flushPromises()
   expect(wrapper.find('img').attributes('src')).toBe('f.png')
 })
 
@@ -76,10 +79,11 @@ test('red is disabled when the pokemon is male only', () => {
   expect(disabled(wrapper, '.pill-blue')).toBe(false)
 })
 
-test('blue is disabled and the female sprite is shown when the pokemon is female only', () => {
+test('blue is disabled and the female sprite is shown when the pokemon is female only', async () => {
   setPokemon({ sprites: { ...SPRITES, female: FEMALE } })
   store.entry.genderRate = 8
   const wrapper = mountScreen()
+  await flushPromises()
   expect(disabled(wrapper, '.pill-blue')).toBe(true)
   expect(disabled(wrapper, '.pill-red')).toBe(false)
   expect(wrapper.find('img').attributes('src')).toBe('ff.png')
@@ -159,8 +163,10 @@ test('round button plays the cry', async () => {
     urls.push(url)
     this.play = play
     this.pause = vi.fn()
+    this.addEventListener = vi.fn()
   })
   await mountScreen().find('.cry-btn').trigger('click')
+  await flushPromises() // the cry address is resolved asynchronously
   expect(urls).toEqual(['cry.ogg'])
   expect(play).toHaveBeenCalledTimes(1)
 })
@@ -179,6 +185,7 @@ test('d-pad arrows, coloured buttons and the cry button give haptic feedback', a
   vi.stubGlobal('Audio', function () {
     this.play = vi.fn().mockResolvedValue(undefined)
     this.pause = vi.fn()
+    this.addEventListener = vi.fn()
   })
   const wrapper = mountScreen()
   // navigation last: it changes the Pokémon
