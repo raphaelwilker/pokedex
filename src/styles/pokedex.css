@@ -21,7 +21,8 @@ body {
   min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: 24px;
+  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right))
+    max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
 }
 
 .device {
@@ -110,10 +111,10 @@ body {
 .dpad-shape { position: absolute; inset: 0; width: 100%; height: 100%; }
 .dp { position: absolute; padding: 0; background: none; border: 0; cursor: pointer; }
 .dp::after { content: ''; position: absolute; inset: 0; margin: auto; width: 13px; height: 13px; background: #9a9a9a; transition: transform .08s; }
-.dp-up { left: 36px; top: 4px; width: 30px; height: 32px; }
-.dp-down { left: 36px; top: 66px; width: 30px; height: 32px; }
-.dp-left { left: 4px; top: 36px; width: 32px; height: 30px; }
-.dp-right { left: 66px; top: 36px; width: 32px; height: 30px; }
+.dp-up { left: 35.29%; top: 3.92%; width: 29.41%; height: 31.37%; }
+.dp-down { left: 35.29%; top: 64.71%; width: 29.41%; height: 31.37%; }
+.dp-left { left: 3.92%; top: 35.29%; width: 31.37%; height: 29.41%; }
+.dp-right { left: 64.71%; top: 35.29%; width: 31.37%; height: 29.41%; }
 .dp-up::after { clip-path: polygon(50% 12%, 92% 88%, 8% 88%); }
 .dp-down::after { clip-path: polygon(8% 12%, 92% 12%, 50% 88%); }
 .dp-left::after { clip-path: polygon(88% 8%, 88% 92%, 12% 50%); }
@@ -169,7 +170,23 @@ body {
 .search-error { color: #ff6b6b; font-weight: bold; font-size: 13px; }
 .search-led { width: 14px; height: 14px; border-radius: 50%; background: #2ecc71; }
 
+/* touch: no double-tap zoom delay, no tap highlight, no text selection on the controls */
+button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.deck, .gen-grid, .prev-next { user-select: none; -webkit-user-select: none; }
+
 @media (max-width: 800px) {
   .device { grid-template-columns: minmax(0, 1fr); }
   .hinge { height: 6px; }
+
+  /* phones: more width, bigger touch targets (44px minimum) */
+  .page {
+    padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+      max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  }
+  .half { padding: 18px; }
+  .pill { height: 36px; font-size: 10px; }
+  .cry-btn { min-width: 44px; min-height: 44px; }
+  .pn-btn, .gen-btn { min-height: 44px; }
+  .search-input { font-size: 16px; } /* iOS zooms into smaller fields on focus */
+  .dpad { width: 130px; height: 130px; }
 }
