@@ -1,13 +1,21 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { usePokedexStore } from '../stores/pokedex'
+import { buzz } from '../native/haptics'
 
 const store = usePokedexStore()
 const number = computed(() => `NO. ${String(store.currentId).padStart(4, '0')}`)
 const sprite = computed(() => store.currentSprite)
 
+// every control gives a light vibration, then does its job
+function press(action: () => unknown): void {
+  buzz()
+  action()
+}
+
 let audio: HTMLAudioElement | null = null
 function playCry(): void {
+  buzz()
   const url = store.entry?.pokemon?.cry
   if (!url) return
   try {
@@ -44,7 +52,7 @@ function playCry(): void {
           :class="{ on: store.isFemale }"
           :disabled="!store.canFemale"
           aria-label="Female sprite"
-          @click="store.setGender('female')"
+          @click="press(() => store.setGender('female'))"
         >
           Female ♀
         </button>
@@ -54,7 +62,7 @@ function playCry(): void {
           :class="{ on: store.canMale && !store.isFemale }"
           :disabled="!store.canMale"
           aria-label="Male sprite"
-          @click="store.setGender('male')"
+          @click="press(() => store.setGender('male'))"
         >
           Male ♂
         </button>
@@ -63,7 +71,7 @@ function playCry(): void {
           class="pill pill-yellow"
           :class="{ on: store.shiny }"
           aria-label="Shiny sprite"
-          @click="store.setShiny(true)"
+          @click="press(() => store.setShiny(true))"
         >
           Shiny
         </button>
@@ -72,7 +80,7 @@ function playCry(): void {
           class="pill pill-green"
           :class="{ on: !store.shiny }"
           aria-label="Normal sprite"
-          @click="store.setShiny(false)"
+          @click="press(() => store.setShiny(false))"
         >
           Comum
         </button>
@@ -107,10 +115,10 @@ function playCry(): void {
           />
           <circle cx="51" cy="51" r="8" fill="url(#dpad-hub)" stroke="var(--ink)" stroke-width="2" />
         </svg>
-        <button type="button" class="dp dp-up" aria-label="Flip sprite" @click="store.toggleBack()"></button>
-        <button type="button" class="dp dp-left" aria-label="Previous" :disabled="!store.canPrev" @click="store.prev()"></button>
-        <button type="button" class="dp dp-right" aria-label="Next" :disabled="!store.canNext" @click="store.next()"></button>
-        <button type="button" class="dp dp-down" aria-label="Flip sprite" @click="store.toggleBack()"></button>
+        <button type="button" class="dp dp-up" aria-label="Flip sprite" @click="press(() => store.toggleBack())"></button>
+        <button type="button" class="dp dp-left" aria-label="Previous" :disabled="!store.canPrev" @click="press(() => store.prev())"></button>
+        <button type="button" class="dp dp-right" aria-label="Next" :disabled="!store.canNext" @click="press(() => store.next())"></button>
+        <button type="button" class="dp dp-down" aria-label="Flip sprite" @click="press(() => store.toggleBack())"></button>
       </div>
     </div>
   </div>

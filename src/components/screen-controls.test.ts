@@ -8,9 +8,13 @@ vi.mock('../api/pokeapi', () => ({
   fetchEntryText: vi.fn()
 }))
 
+vi.mock('../native/haptics', () => ({ buzz: vi.fn() }))
+
 import * as api from '../api/pokeapi'
+import { buzz } from '../native/haptics'
 const fetchPokemon = vi.mocked(api.fetchPokemon)
 const fetchEntryText = vi.mocked(api.fetchEntryText)
+const buzzMock = vi.mocked(buzz)
 import { usePokedexStore } from '../stores/pokedex'
 import ScreenDisplay from './ScreenDisplay.vue'
 
@@ -34,6 +38,7 @@ beforeEach(() => {
   setActivePinia(pinia)
   fetchPokemon.mockReset().mockImplementation(async (id) => ({ id, name: `p${id}`, sprite: 'x.png', sprites: SPRITES, types: [], heightM: 1, weightKg: 1 } as never))
   fetchEntryText.mockReset().mockResolvedValue('text')
+  buzzMock.mockClear()
   store = usePokedexStore()
   store.currentId = 1
   store.status = 'idle'
@@ -166,4 +171,26 @@ test('round button does nothing when there is no cry', async () => {
   vi.stubGlobal('Audio', audio)
   await mountScreen().find('.cry-btn').trigger('click')
   expect(audio).not.toHaveBeenCalled()
+})
+
+test('d-pad arrows, coloured buttons and the cry button give haptic feedback', async () => {
+  store.entry.genderRate = 4
+  store.currentId = 5 // so both PREV and NEXT are enabled
+  vi.stubGlobal('Audio', function () {
+    this.play = vi.fn().mockResolvedValue(undefined)
+    this.pause = vi.fn()
+  })
+  const wrapper = mountScreen()
+  // navigation last: it changes the Pokémon
+  for (const selector of ['.pill-red', '.pill-blue', '.pill-yellow', '.pill-green', '.cry-btn', '.dp-up', '.dp-down', '.dp-left', '.dp-right']) {
+    buzzMock.mockClear()
+    await wrapper.find(selector).trigger('click')
+    expect(buzzMock, selector).toHaveBeenCalledTimes(1)
+  }
+})
+
+test('a disabled button gives no haptic feedback', async () => {
+  const wrapper = mountScreen()
+  await wrapper.find('.dp-left').trigger('click')
+  expect(buzzMock).not.toHaveBeenCalled()
 })
