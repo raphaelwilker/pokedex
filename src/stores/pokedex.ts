@@ -1,10 +1,40 @@
 import { defineStore } from 'pinia'
 import { fetchPokemonList, fetchPokemon, fetchEntryText, fetchGenderRate } from '../api/pokeapi'
+import { getEntry, setEntry, getList, setList } from '../cache/storage'
 import { MAX_ID, generationOf, regionOf, rangeFor } from '../data/generations'
 import type { GenerationKey } from '../data/generations'
 import type { Gender, PokedexEntry, PokemonListItem, SpriteKey, Status } from '../types'
 
 let requestToken = 0
+
+// The permanent cache is an optimisation: reading or saving must never break the app.
+async function readSavedEntry(id: number): Promise<PokedexEntry | undefined> {
+  try {
+    return await getEntry(id)
+  } catch {
+    return undefined
+  }
+}
+
+function saveEntry(id: number, entry: PokedexEntry): void {
+  Promise.resolve()
+    .then(() => setEntry(id, entry))
+    .catch(() => {})
+}
+
+async function readSavedList(): Promise<PokemonListItem[] | undefined> {
+  try {
+    return await getList()
+  } catch {
+    return undefined
+  }
+}
+
+function saveList(list: PokemonListItem[]): void {
+  Promise.resolve()
+    .then(() => setList(list))
+    .catch(() => {})
+}
 
 function isValidId(id: number): boolean {
   return Number.isInteger(id) && id >= 1 && id <= MAX_ID
@@ -88,8 +118,14 @@ export const usePokedexStore = defineStore('pokedex', {
     async init(): Promise<void> {
       if (this.list.length) return
       this.listError = false
+      const savedList = await readSavedList()
+      if (savedList?.length) {
+        this.list = savedList
+        return
+      }
       try {
         this.list = await fetchPokemonList()
+        saveList(this.list)
       } catch {
         this.listError = true
       }
@@ -102,7 +138,11 @@ export const usePokedexStore = defineStore('pokedex', {
       this.status = 'loading'
       this.entry = this.cache[target] ?? null
       try {
-        let entry = this.cache[target]
+        let entry: PokedexEntry | undefined = this.cache[target]
+        if (!entry) {
+          entry = await readSavedEntry(target)
+          if (entry) this.cache[target] = entry
+        }
         if (!entry) {
           const [pokemon, text, genderRate] = await Promise.all([
             fetchPokemon(target),
@@ -115,6 +155,7 @@ export const usePokedexStore = defineStore('pokedex', {
           ])
           entry = { pokemon, text, genderRate }
           this.cache[target] = entry
+          saveEntry(target, entry)
         }
         if (token !== requestToken) return
         this.entry = entry

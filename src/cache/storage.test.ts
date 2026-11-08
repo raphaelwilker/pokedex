@@ -2,6 +2,9 @@ import { test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { IDBFactory } from 'fake-indexeddb'
 import type { PokedexEntry, PokemonListItem } from '../types'
 
+// the global test setup replaces the cache with a no-op; these tests need the real one
+vi.unmock('./storage')
+
 const NO_SPRITES = { front: null, shiny: null, back: null, backShiny: null }
 
 function entry(id: number, extra: Partial<PokedexEntry> = {}): PokedexEntry {
