@@ -28,6 +28,13 @@ export async function fetchPokemon(id) {
     id: data.id,
     name: data.name,
     sprite: data.sprites?.front_default ?? null,
+    sprites: {
+      front: data.sprites?.front_default ?? null,
+      shiny: data.sprites?.front_shiny ?? null,
+      back: data.sprites?.back_default ?? null,
+      backShiny: data.sprites?.back_shiny ?? null
+    },
+    cry: data.cries?.latest ?? data.cries?.legacy ?? null,
     types: data.types.map((t) => t.type.name),
     heightM: data.height / 10,
     weightKg: data.weight / 10
