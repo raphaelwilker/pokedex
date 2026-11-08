@@ -35,10 +35,8 @@ export const usePokedexStore = defineStore('pokedex', {
       const p = state.entry?.pokemon
       if (!p) return null
       const s = p.sprites ?? { front: p.sprite }
-      const pick = state.back
-        ? (state.shiny ? s.backShiny : s.back)
-        : (state.shiny ? s.shiny : s.front)
-      return pick ?? s.front ?? null
+      const key = state.back ? (state.shiny ? 'backShiny' : 'back') : state.shiny ? 'shiny' : 'front'
+      return p.animated?.[key] ?? s[key] ?? p.animated?.front ?? s.front ?? null
     }
   },
 
