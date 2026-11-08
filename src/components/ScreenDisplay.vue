@@ -1,11 +1,35 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { usePokedexStore } from '../stores/pokedex'
 import { buzz } from '../native/haptics'
+import { resolveMedia, revokeMedia } from '../cache/media'
 
 const store = usePokedexStore()
 const number = computed(() => `NO. ${String(store.currentId).padStart(4, '0')}`)
-const sprite = computed(() => store.currentSprite)
+// The sprite shown is the local copy when the file was seen before (works offline).
+const shownSprite = ref<string | null>(null)
+let spriteRequest = 0
+
+watch(
+  () => store.currentSprite,
+  async (url) => {
+    const mine = ++spriteRequest
+    if (!url) {
+      if (shownSprite.value) revokeMedia(shownSprite.value)
+      shownSprite.value = null
+      return
+    }
+    const resolved = await resolveMedia(url)
+    if (mine !== spriteRequest) {
+      revokeMedia(resolved) // a newer request took over while this one was pending
+      return
+    }
+    const previous = shownSprite.value
+    shownSprite.value = resolved
+    if (previous) revokeMedia(previous)
+  },
+  { immediate: true }
+)
 
 // every control gives a light vibration, then does its job
 function press(action: () => unknown): void {
@@ -14,20 +38,41 @@ function press(action: () => unknown): void {
 }
 
 let audio: HTMLAudioElement | null = null
-function playCry(): void {
+let cryUrl: string | null = null
+
+function stopCry(): void {
+  if (audio) audio.pause()
+  if (cryUrl) revokeMedia(cryUrl)
+  audio = null
+  cryUrl = null
+}
+
+async function playCry(): Promise<void> {
   buzz()
   const url = store.entry?.pokemon?.cry
   if (!url) return
   try {
-    if (audio) audio.pause()
-    audio = new Audio(url)
-    audio.volume = 0.5
-    const result = audio.play()
+    const src = await resolveMedia(url)
+    stopCry()
+    cryUrl = src
+    const player = new Audio(src)
+    audio = player
+    player.volume = 0.5
+    player.addEventListener('ended', () => {
+      if (audio === player) stopCry()
+    })
+    const result = player.play()
     if (result?.catch) result.catch(() => {})
   } catch {
     // audio not available
   }
 }
+
+onBeforeUnmount(() => {
+  spriteRequest++ // ignore any answer still pending
+  if (shownSprite.value) revokeMedia(shownSprite.value)
+  stopCry()
+})
 </script>
 
 <template>
@@ -35,8 +80,8 @@ function playCry(): void {
     <div class="screen">
       <div class="lcd">
         <span v-if="store.status === 'loading'" class="lcd-loading">LOADING...</span>
-        <div v-else-if="sprite" class="sprite-box">
-          <img :src="sprite" :alt="store.entry?.pokemon.name" class="sprite" />
+        <div v-else-if="shownSprite" class="sprite-box">
+          <img :src="shownSprite" :alt="store.entry?.pokemon.name" class="sprite" />
         </div>
       </div>
     </div>

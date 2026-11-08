@@ -9,6 +9,11 @@ const name = computed(() => {
   const species = store.list.find((p) => p.id === pokemon.id)
   return (species?.name ?? pokemon.name).toUpperCase()
 })
+// not reactive on its own: it is read again every time the error state renders
+function isOffline(): boolean {
+  return navigator.onLine === false
+}
+
 const text = computed(() => {
   if (!store.entry) return 'LOADING...'
   return store.entry.text ? store.entry.text.toUpperCase() : 'NO DATA'
@@ -22,6 +27,7 @@ const text = computed(() => {
     <div class="terminal">
       <template v-if="store.status === 'error'">
         <p>ERROR: COULD NOT LOAD DATA.</p>
+        <p v-if="isOffline()">YOU ARE OFFLINE.</p>
         <button type="button" class="retry" @click="store.retry()">tentar de novo</button>
       </template>
       <p v-else>{{ text }}</p>
