@@ -95,9 +95,7 @@ test('a slow answer for a sprite you already changed away from is discarded and 
   expect(revokeMedia).toHaveBeenCalledWith('blob:late-front')
 })
 
-test('the cry plays from the local copy returned by the media cache', async () => {
-  setPokemon('https://x/front.png', null, 'https://x/cry.ogg')
-  const sources: string[] = []
+function stubAudio(sources: string[]): void {
   vi.stubGlobal(
     'Audio',
     function (this: { play: () => Promise<void>; pause: () => void; addEventListener: () => void }, src: string) {
@@ -107,12 +105,43 @@ test('the cry plays from the local copy returned by the media cache', async () =
       this.addEventListener = vi.fn()
     }
   )
+}
+
+// Mobile Safari only lets audio start inside the tap itself, so the Audio must be
+// created and played synchronously in the click handler (no await before play()).
+test('the cry plays from the local copy, started synchronously inside the tap', async () => {
+  setPokemon('https://x/front.png', null, 'https://x/cry.ogg')
+  const sources: string[] = []
+  stubAudio(sources)
   const wrapper = mountScreen()
-  await wrapper.find('.cry-btn').trigger('click')
-  await flushPromises()
+  await flushPromises() // the local copy of the cry is prepared when the Pokémon appears
   expect(resolveMedia).toHaveBeenCalledWith('https://x/cry.ogg')
+  ;(wrapper.find('.cry-btn').element as HTMLButtonElement).click() // no await on purpose
   expect(sources).toEqual(['blob:local-cry.ogg'])
   vi.unstubAllGlobals()
+})
+
+test('if the local copy is not ready yet, the cry still plays at once from the original address', async () => {
+  setPokemon('https://x/front.png', null, 'https://x/cry.ogg')
+  resolveMedia.mockImplementation((url) => (url.endsWith('cry.ogg') ? new Promise(() => {}) : Promise.resolve(url)))
+  const sources: string[] = []
+  stubAudio(sources)
+  const wrapper = mountScreen()
+  await flushPromises()
+  ;(wrapper.find('.cry-btn').element as HTMLButtonElement).click()
+  expect(sources).toEqual(['https://x/cry.ogg'])
+  vi.unstubAllGlobals()
+})
+
+test('changing Pokémon releases the previous cry copy', async () => {
+  setPokemon('https://x/front.png', null, 'https://x/cry.ogg')
+  const wrapper = mountScreen()
+  await flushPromises()
+  setPokemon('https://x/front2.png', null, 'https://x/cry2.ogg')
+  await flushPromises()
+  expect(revokeMedia).toHaveBeenCalledWith('blob:local-cry.ogg')
+  wrapper.unmount()
+  expect(revokeMedia).toHaveBeenCalledWith('blob:local-cry2.ogg')
 })
 
 function offline(value: boolean): void {

@@ -136,3 +136,19 @@ test('a failing list read falls back to the API', async () => {
   expect(store.list).toEqual([{ id: 25, name: 'pikachu' }])
   expect(store.listError).toBe(false)
 })
+
+test('a Pokémon whose gender lookup failed is shown but NOT saved, so the next session asks again', async () => {
+  fetchGenderRate.mockRejectedValue(new Error('rate limited'))
+  const store = usePokedexStore()
+  await store.select(29)
+  expect(store.status).toBe('idle')
+  expect(store.entry?.genderRate).toBeNull()
+  expect(setEntry).not.toHaveBeenCalled()
+})
+
+test('a genuinely unknown gender (the API answered without one) is saved normally', async () => {
+  fetchGenderRate.mockResolvedValue(null)
+  const store = usePokedexStore()
+  await store.select(29)
+  expect(setEntry).toHaveBeenCalledTimes(1)
+})

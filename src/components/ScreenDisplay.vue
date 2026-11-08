@@ -37,29 +37,50 @@ function press(action: () => unknown): void {
   action()
 }
 
+// The cry: its local copy is prepared as soon as the Pokémon appears, so that tapping the
+// button can start the sound synchronously (mobile Safari only allows audio inside the tap).
+const cryReady = ref<string | null>(null)
+let cryRequest = 0
 let audio: HTMLAudioElement | null = null
-let cryUrl: string | null = null
 
 function stopCry(): void {
   if (audio) audio.pause()
-  if (cryUrl) revokeMedia(cryUrl)
   audio = null
-  cryUrl = null
 }
 
-async function playCry(): Promise<void> {
-  buzz()
-  const url = store.entry?.pokemon?.cry
-  if (!url) return
-  try {
-    const src = await resolveMedia(url)
+watch(
+  () => store.entry?.pokemon?.cry ?? null,
+  async (url) => {
+    const mine = ++cryRequest
     stopCry()
-    cryUrl = src
+    if (!url) {
+      if (cryReady.value) revokeMedia(cryReady.value)
+      cryReady.value = null
+      return
+    }
+    const resolved = await resolveMedia(url)
+    if (mine !== cryRequest) {
+      revokeMedia(resolved)
+      return
+    }
+    const previous = cryReady.value
+    cryReady.value = resolved
+    if (previous) revokeMedia(previous)
+  },
+  { immediate: true }
+)
+
+function playCry(): void {
+  buzz()
+  const src = cryReady.value ?? store.entry?.pokemon?.cry
+  if (!src) return
+  try {
+    stopCry()
     const player = new Audio(src)
     audio = player
     player.volume = 0.5
     player.addEventListener('ended', () => {
-      if (audio === player) stopCry()
+      if (audio === player) audio = null
     })
     const result = player.play()
     if (result?.catch) result.catch(() => {})
@@ -70,7 +91,9 @@ async function playCry(): Promise<void> {
 
 onBeforeUnmount(() => {
   spriteRequest++ // ignore any answer still pending
+  cryRequest++
   if (shownSprite.value) revokeMedia(shownSprite.value)
+  if (cryReady.value) revokeMedia(cryReady.value)
   stopCry()
 })
 </script>

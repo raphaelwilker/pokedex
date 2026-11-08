@@ -144,6 +144,7 @@ export const usePokedexStore = defineStore('pokedex', {
           if (entry) this.cache[target] = entry
         }
         if (!entry) {
+          let genderFailed = false
           const [pokemon, text, genderRate] = await Promise.all([
             fetchPokemon(target),
             fetchEntryText(target),
@@ -151,11 +152,15 @@ export const usePokedexStore = defineStore('pokedex', {
             Promise.resolve()
               .then(() => fetchGenderRate(target))
               .then((rate) => (typeof rate === 'number' ? rate : null))
-              .catch(() => null)
+              .catch(() => {
+                genderFailed = true
+                return null
+              })
           ])
           entry = { pokemon, text, genderRate }
           this.cache[target] = entry
-          saveEntry(target, entry)
+          // an unknown gender caused by a failed request must not be kept forever
+          if (!genderFailed) saveEntry(target, entry)
         }
         if (token !== requestToken) return
         this.entry = entry

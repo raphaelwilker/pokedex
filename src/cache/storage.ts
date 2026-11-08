@@ -1,6 +1,7 @@
 import { createStore, get, set } from 'idb-keyval'
 import type { UseStore } from 'idb-keyval'
 import type { PokedexEntry, PokemonListItem } from '../types'
+import { withTimeout } from './timeout'
 
 /*
  * Permanent cache for Pokémon data, backed by IndexedDB (works in browsers and
@@ -27,7 +28,7 @@ async function read(key: string): Promise<unknown> {
   const db = database()
   if (db) {
     try {
-      const value = await get(key, db)
+      const value = await withTimeout(get(key, db) as Promise<unknown>, undefined)
       if (value !== undefined) memory.set(key, value)
       return value
     } catch {
@@ -42,7 +43,7 @@ async function write(key: string, value: unknown): Promise<void> {
   const db = database()
   if (!db) return
   try {
-    await set(key, value, db)
+    await withTimeout(set(key, value, db), undefined)
   } catch {
     // memory still has it for this session
   }
