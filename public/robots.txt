@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://raphaelwilker.github.io/pokedex/sitemap.xml
